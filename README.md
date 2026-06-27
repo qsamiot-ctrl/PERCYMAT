@@ -1,8 +1,3 @@
-Here is the updated, highly detailed, and professional `README.md` in English. I have added a dedicated **Citation & Attribution Clause** right at the beginning to ensure you are credited as **Dr. Quentin AMIOT** if anyone uses or builds upon this application.
-
-You can copy and paste the markdown code below directly into your GitHub repository:
-
-```markdown
 # PERCYMAT v2.4 🧬
 
 **PERCYMAT** is an interactive web application developed in R (Shiny) designed for predictive modeling and Artificial Intelligence (AI) assisted diagnosis in the context of **Chronic Lymphocytic Leukemia (CLL)**. 
