@@ -2,15 +2,16 @@
 
 **PERCYMAT** is an interactive web application developed in R (Shiny) designed for predictive modeling and Artificial Intelligence (AI) assisted diagnosis in the context of **Chronic Lymphocytic Leukemia (CLL)**. 
 
-The computational pipeline is strictly engineered to comply with the **TRIPOD-AI** guidelines, mitigating optimism bias (overfitting) and preventing data leakage in small clinical cohorts.
+The computational pipeline is strictly engineered to comply with **TRIPOD-AI** guidelines, mitigating optimism bias (overfitting) and preventing data leakage in small clinical cohorts.
 
 ---
 
 ## ⚖️ Citation & Attribution Clause
 
-If you use this application, its source code, the underlying algorithmic architecture, or any generated results for clinical practice, research, academic publications, or commercial purposes, **you must explicitly cite and credit the author**:
+If you use this application, its source code, the underlying algorithmic architecture, or any generated results for clinical practice, research, academic publications, or commercial purposes, **you must explicitly cite and credit the author:**
 
-> **Dr. Quentin AMIOT** > *Author and Principal Developer of PERCYMAT v2.4*
+> **Dr. Quentin AMIOT**
+> *Author and Principal Developer of PERCYMAT v2.4*
 
 **Recommended Citation Format for Publications:**
 > *Amiot, Q. (2026). PERCYMAT v2.4: Advanced AI-driven pipeline for Chronic Lymphocytic Leukemia cytometric modeling and diagnosis. GitHub Repository.*
@@ -20,7 +21,7 @@ If you use this application, its source code, the underlying algorithmic archite
 ## 📑 Table of Contents
 1. [Core Features](#-core-features)
 2. [Prerequisites & Installation](#%EF%B8%8F-prerequisites--installation)
-3. [Data Format Requirements](#-data-format-requirements)
+3. [Specific Data Format](#-specific-data-format)
 4. [User Guide](#-user-guide)
 5. [Algorithmic Architecture](#-algorithmic-architecture)
 
@@ -32,8 +33,8 @@ The application is divided into 3 specialized tabs:
 
 | Tab | Description |
 | :--- | :--- |
-| **1. MODELIZATION** | Import training and external validation cohorts. Automate feature engineering (ratios, markers combinatorics), apply an EPV filter, and run an AutoML Grid Search. Evaluate performances using interactive ROC, PR-AUC, Calibration, and DCA curves. Detect atypical profiles using UMAP, HDBSCAN, and Isolation Forest. |
-| **2. DIAGNOSTIC** | Manually input a patient's cytometric markers. Compute the real-time probability of CLL, backed by *Conformal Prediction* safety bounds, and visualize a local Explainable AI (XAI) contribution plot. |
+| **1. MODELIZATION** | Import training and external validation cohorts. Automate feature engineering (ratios combinatorics, markers), apply an EPV filter, and run an AutoML Grid Search. Evaluate performances using interactive curves (ROC, PR-AUC, Calibration, DCA). Detect atypical profiles using UMAP, HDBSCAN, and Isolation Forest. |
+| **2. DIAGNOSTIC** | Manually input a patient's cytometric markers. Compute the real-time probability of CLL, backed by *Conformal Prediction* safety bounds, and visualize a local Explainable AI (XAI) contribution plot (Log-Odds breakdown). |
 | **3. METHODOLOGY** | Built-in technical documentation detailing the mathematical equations and rigorous validation steps (Nested-CV, Z-score, Platt Scaling). |
 
 ---
@@ -51,7 +52,7 @@ cd PERCYMAT
 
 ### 2. Install Dependencies
 
-The application automatically checks for and installs missing packages upon startup. However, you can install them manually by running the following command in your R console:
+The application automatically checks for and installs missing packages upon startup. You can also install them manually by running the following command in your R console:
 
 ```R
 required_packages <- c(
@@ -75,14 +76,14 @@ shiny::runApp()
 
 ---
 
-## 📊 Data Format Requirements
+## 📊 Specific Data Format
 
-The application accepts **CSV** (`.csv`) or **Excel** (`.xls`, `.xlsx`) files. To ensure proper processing, your dataset should match the following nomenclature:
+The application accepts **CSV** (`.csv`) or **Excel** (`.xls`, `.xlsx`) files. To ensure proper processing, your data file must strictly follow this nomenclature:
 
-* **Target Variable:** The column containing the final diagnosis must be named `LLC` or `LLC_1` (coded as binary format: `1` for CLL, `0` for other conditions).
-* **Patient Identifier:** An `ID_Interne` column (optional; automatically generated as *Patient_X* if missing).
-* **Matutes Score:** A `Matutes` column (optional). If provided, the app generates automated reclassification tables (Matutes vs. AI) and a hierarchical clustering Heatmap for Matutes 3 borderline cases.
-* **Predictive Markers:** All other numeric columns will be automatically detected and scaled as candidate predictors (e.g., *CD5, CD19, CD23...*).
+* **`LLC` (or `LLC_1`) Column:** The target column containing the final diagnosis (coded in binary format: `1` for CLL, `0` for another pathology / alternative diagnosis).
+* **Marker Columns (RFI):** All numeric columns corresponding to biological markers expressed as **RFI** (computed as the ratio: *MFI of the CD19+ lymphocyte population / MFI of non-CD19 lymphocytes*). These variables are automatically detected, standardized (Z-score), and used as candidate predictors (e.g., *CD5, CD23, etc.*).
+* **`Matutes` Column:** The column containing the human Matutes score (optional). If provided, the app automatically generates reclassification tables (Matutes vs. AI) and a hierarchical clustering Heatmap for in-depth analysis of borderline cases (Matutes = 3).
+* **Identifier:** An `ID_Interne` column (optional; automatically generated as *Patient_X* if missing).
 
 ---
 
@@ -100,14 +101,14 @@ The application accepts **CSV** (`.csv`) or **Excel** (`.xls`, `.xlsx`) files. T
 ### Step 2: Performance & Topography Analysis
 
 * **Metrics:** Review the *Out-Of-Bag* validation parameters (AUC, PR-AUC, Brier Score, Emax, ICI).
-* **Odds Ratios:** Check the most predictive markers selected by the Elastic-Net regularization.
+* **Odds Ratios:** Check the Elastic-Net coefficients table to identify the most discriminative RFIs.
 * **Topography:** Click on individual points in the interactive UMAP/HDBSCAN chart to deeply explore intra-group Z-scores and analyze patients isolated by the *Isolation Forest*.
 
 ### Step 3: Patient Diagnosis
 
 1. Switch to the **2. DIAGNOSTIC** tab.
-2. Fill in the cytometric/biological values for your new patient (fields are dynamically adapted to your model markers).
-3. Click **"CALCULER PROBABILITÉ LLC"** to receive a calibrated risk score, a 95% Conformal Prediction set, and a local explanation chart (Log-Odds breakdown).
+2. Fill in the RFI values for the new patient (input fields dynamically adapt to the markers included in your model).
+3. Click **"CALCULER PROBABILITÉ LLC"** to receive a calibrated risk score, a 95% Conformal Prediction certainty set, and a local explanation chart (XAI).
 
 ---
 
@@ -117,9 +118,9 @@ PERCYMAT v2.4 implements high-tier statistical learning concepts to neutralize s
 
 * **Repeated Nested Cross-Validation:** Impermeable outer/inner loop segregation preventing data leakage during feature optimization.
 * **Dynamic EPV Filter:** Maintains the Events-Per-Variable ratio ($\ge 5$) directly inside the CV training folds.
-* **Elastic-Net Regularization:** Combines L1 (Lasso) and L2 (Ridge) penalties to select robust predictors and handle highly correlated cytometric markers.
+* **Elastic-Net Regularization:** Combines L1 (Lasso) and L2 (Ridge) penalties to select robust predictors and handle the inherent collinearity of cytometric markers.
 * **Bayesian Platt Scaling:** Calibrates raw log-odds predictions using an out-of-bag Bayesian logistic regression model.
-* **Conformal Prediction:** Wraps predictions with rigorous mathematical certainty bounds based on non-conformity scores computed on the training cohort.
+* **Conformal Prediction:** Wraps predictions with rigorous mathematical certainty bounds (95% coverage) based on non-conformity scores computed on the training cohort.
 * **Topographical Anomaly Detection:** Applies an absolute Isolation Forest threshold (calibrated on the 95th percentile of the training cohort) to unconditionally flag atypical expressions across both internal and external datasets.
 
 ---
@@ -127,5 +128,7 @@ PERCYMAT v2.4 implements high-tier statistical learning concepts to neutralize s
 *Developed for clinical research and cytometric diagnostic optimization. Distributed under academic attribution guidelines.*
 
 ```
+
+Vous pouvez copier et coller directement ce bloc de code dans le fichier `README.md` sur votre dépôt GitHub.
 
 ```
