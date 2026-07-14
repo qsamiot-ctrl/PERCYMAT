@@ -1,10 +1,15 @@
 # --- INSTALLATION ET CHARGEMENT DES PACKAGES ---
 packages_requis <- c(
-  "shiny", "pROC", "shinythemes", "glmnet", "DT", 
-  "ggplot2", "stats", "arm", "rmarkdown", "dplyr",
-  "gridExtra", "PRROC", "readxl", "tools", "scales",
-  "umap", "pheatmap", "cluster", 
-  "dbscan", "isotree", "tidyr"
+  "shiny", "pROC",
+  "shinythemes", "glmnet", "DT", 
+  "ggplot2", "stats",
+  "arm", "rmarkdown", "dplyr",
+  "gridExtra", "PRROC",
+  "readxl", "tools", "scales",
+  "umap", "pheatmap",
+  "cluster", 
+  "dbscan", "isotree",
+  "tidyr"
 )
 
 for (pkg in packages_requis) {
@@ -51,194 +56,194 @@ ui <- navbarPage(
   ),
   
   tabPanel("1. MODELISATION",
-           sidebarLayout(
-             sidebarPanel(
-               h4("Cohorte d'Apprentissage", style="font-weight: 700; color: #0f172a;"),
-               fileInput("file_csv", "Importer CSV / Excel", accept = c(".csv", "text/csv", ".xlsx", ".xls")),
-               
-               h4("Cohorte de Validation Externe", style="font-weight: 700; color: #0f172a; margin-top:25px;"),
-               fileInput("file_ext", "Importer CSV / Excel", accept = c(".csv", "text/csv", ".xlsx", ".xls")),
-               
-               hr(),
-               checkboxInput("use_weights", "Marqueurs", TRUE),
-               checkboxInput("calc_ratios_simple", "Variables simples (A/B) + Marqueurs", FALSE),
-               checkboxInput("calc_ratios_all", "Toutes combinaisons (A/B, Log, etc.) + Marqueurs", FALSE),
-               checkboxInput("use_epv_filter", "Filtre Statistique (EPV)", FALSE),
-               checkboxInput("auto_ml", "⚡ Performance IA (Grid Search Automatique)", FALSE),
-               numericInput("cv_repeats", "Nombre de répétitions Nested-CV", value = 10, min = 1, max = 50),
-               
-               hr(),
-               actionButton("update_model", "LANCER LA MODÉLISATION",
-                            class = "btn-success btn-lg btn-block", 
-                            style = "font-weight: 700; border-radius: 10px;",
-                            icon = icon("play-circle")),
-               hr(),
-               helpText("V2.4: Elastic-Net, HDBSCAN, Isolation Forest & Local Log-Odds Explainer")
-             ),
-             mainPanel(
-               tabsetPanel(
-                 tabPanel("Performances", 
-                          br(),
-                          uiOutput("patient_count_ui"),
-                          
-                          fluidRow(
-                            column(6, div(class="modern-card", 
-                                          h5("Courbe ROC", style="font-weight:700;"),
-                                          p("Evaluation des FP et FN.", style="font-size:0.85em; color:#64748b;"),
-                                          plotOutput("plot_roc"))),
-                            column(6, div(class="modern-card", 
-                                          h5("Courbe de Calibration", style="font-weight:700;"),
-                                          p("Evaluation de la concordance avec le diagnostic.", style="font-size:0.85em; color:#64748b;"),
-                                          plotOutput("plot_calib")))
-                          ),
-                          fluidRow(
-                            column(6, div(class="modern-card",
-                                          h5("PR-AUC", style="font-weight:700;"),
-                                          p("Evaluation des FP et VP.", style="font-size:0.85em; color:#64748b;"),
-                                          plotOutput("plot_pr"))),
-                            column(6, div(class="modern-card", 
-                                          h5("Decision Curve Analysis", style="font-weight:700;"),
-                                          p("Evaluation de l’utilité clinique du modèle.", style="font-size:0.85em; color:#64748b;"),
-                                          plotOutput("plot_dca")))
-                          ),
-                          br(),
-                          h4("Performances : Cohorte d'Apprentissage (Repeated Nested-CV)", style="font-weight:700; color:#0f172a; margin-top: 20px; margin-left: 5px;"),
-                          uiOutput("metrics_ui"),
-                          uiOutput("nature_metrics_ui"),
-                          uiOutput("ext_metrics_title_ui"),
-                          uiOutput("ext_metrics_ui"),
-                          uiOutput("agreement_ui")
-                 ),
-                 tabPanel("Odds ratio & Stabilité", 
-                          br(),
-                          uiOutput("top_markers_ui"),
-                          hr(),
-                          div(class="modern-card", DTOutput("coef_table"))
-                 ),
-                 tabPanel("Clusters & Atypies",
-                          br(),
-                          uiOutput("matutes_reclass_ui"),
-                          
-                          fluidRow(
-                            column(12, div(class="modern-card", style="border-top: 5px solid #4c1d95;",
-                                           h5("UMAP & HDBSCAN Clustering", style="font-weight:700; color:#a855f7; margin-bottom:10px;"),
-                                           p("Les patients dits 'atypiques' (Violet) sont détectés par Isolation Forest. Cliquez sur un point pour voir les caractéristiques.", style="font-size:0.85em; color:#64748b;"),
-                                           plotOutput("plot_atypical", click = "plot_atypical_click"),
-                                           uiOutput("cluster_click_info"),
-                                           br(),
-                                           hr(style="border-top: 1px dashed #cbd5e1; margin-top: 15px; margin-bottom: 15px;"),
-                                           h5("Patients Atypiques (Récapitulatif)", style="font-weight:700; color:#e11d48; margin-top:10px;"),
-                                           p("Sélectionnés par Isolation Forest ou par différence probabilité calculée vs diagnostique > 50%.", style="font-size:0.85em; color:#64748b;"),
-                                           DTOutput("table_recap_atypiques"),
-                                           br(),
-                                           h5("Détails de tous les Patients", style="font-weight:700; color:#a855f7; margin-top:20px;"),
-                                           p("Cliquez sur une ligne pour localiser le patient sur les graphiques ci-dessus.", style="font-size:0.85em; color:#64748b; font-style:italic;"),
-                                           DTOutput("table_atypical")
-                            ))
-                          ),
-                          uiOutput("heatmap_matutes_ui")
-                 )
-               )
-             )
-           )
+    sidebarLayout(
+      sidebarPanel(
+        h4("Cohorte d'Apprentissage", style="font-weight: 700; color: #0f172a;"),
+        fileInput("file_csv", "Importer CSV / Excel", accept = c(".csv", "text/csv", ".xlsx", ".xls")),
+        
+        h4("Cohorte de Validation Externe", style="font-weight: 700; color: #0f172a; margin-top:25px;"),
+        fileInput("file_ext", "Importer CSV / Excel", accept = c(".csv", "text/csv", ".xlsx", ".xls")),
+        
+        hr(),
+        checkboxInput("use_weights", "Marqueurs", TRUE),
+        checkboxInput("calc_ratios_simple", "Variables simples (A/B) + Marqueurs", FALSE),
+        checkboxInput("calc_ratios_all", "Toutes combinaisons (A/B, Log, etc.) + Marqueurs", FALSE),
+        checkboxInput("use_epv_filter", "Filtre Statistique (EPV)", FALSE),
+        checkboxInput("auto_ml", "⚡Analyse non supervisée", FALSE),
+        numericInput("cv_repeats", "Nombre de répétitions Nested-CV", value = 10, min = 1, max = 50),
+       
+        hr(),
+        actionButton("update_model", "LANCER LA MODÉLISATION",
+                     class = "btn-success btn-lg btn-block", 
+                     style = "font-weight: 700; border-radius: 10px;",
+                     icon = icon("play-circle")),
+        hr(),
+        helpText("V2.4: Elastic-Net, HDBSCAN, Isolation Forest & Local Log-Odds Explainer")
+      ),
+      mainPanel(
+        tabsetPanel(
+          tabPanel("Performances", 
+            br(),
+            uiOutput("patient_count_ui"),
+            
+            fluidRow(
+              column(6, div(class="modern-card", 
+                h5("Courbe ROC", style="font-weight:700;"),
+                p("Evaluation des FP et FN.", style="font-size:0.85em; color:#64748b;"),
+                plotOutput("plot_roc"))),
+              column(6, div(class="modern-card", 
+                h5("Courbe de Calibration", style="font-weight:700;"),
+                p("Evaluation de la concordance avec le diagnostic.", style="font-size:0.85em; color:#64748b;"),
+                plotOutput("plot_calib")))
+            ),
+            fluidRow(
+              column(6, div(class="modern-card",
+                h5("PR-AUC", style="font-weight:700;"),
+                p("Evaluation des FP et VP.", style="font-size:0.85em; color:#64748b;"),
+                plotOutput("plot_pr"))),
+              column(6, div(class="modern-card", 
+                h5("Decision Curve Analysis", style="font-weight:700;"),
+                p("Evaluation de l’utilité clinique du modèle.", style="font-size:0.85em; color:#64748b;"),
+                plotOutput("plot_dca")))
+            ),
+            br(),
+            h4("Performances : Cohorte d'Apprentissage (Repeated Nested-CV)", style="font-weight:700; color:#0f172a; margin-top: 20px; margin-left: 5px;"),
+            uiOutput("metrics_ui"),
+            uiOutput("nature_metrics_ui"),
+            uiOutput("ext_metrics_title_ui"),
+            uiOutput("ext_metrics_ui"),
+            uiOutput("agreement_ui")
+          ),
+          tabPanel("Odds ratio & Stabilité", 
+            br(),
+            uiOutput("top_markers_ui"),
+            hr(),
+            div(class="modern-card", DTOutput("coef_table"))
+          ),
+          tabPanel("Clusters & Atypies",
+            br(),
+            uiOutput("matutes_reclass_ui"),
+            
+            fluidRow(
+              column(12, div(class="modern-card", style="border-top: 5px solid #4c1d95;",
+                h5("UMAP & HDBSCAN Clustering", style="font-weight:700; color:#a855f7; margin-bottom:10px;"),
+                p("Les patients dits 'atypiques' (Violet) sont détectés par Isolation Forest. Cliquez sur un point pour voir les caractéristiques.", style="font-size:0.85em; color:#64748b;"),
+                plotOutput("plot_atypical", click = "plot_atypical_click"),
+                uiOutput("cluster_click_info"),
+                br(),
+                hr(style="border-top: 1px dashed #cbd5e1; margin-top: 15px; margin-bottom: 15px;"),
+                h5("Patients Atypiques (Récapitulatif)", style="font-weight:700; color:#e11d48; margin-top:10px;"),
+                p("Sélectionnés par Isolation Forest ou par différence probabilité calculée vs diagnostique > 50%.", style="font-size:0.85em; color:#64748b;"),
+                DTOutput("table_recap_atypiques"),
+                br(),
+                h5("Détails de tous les Patients", style="font-weight:700; color:#a855f7; margin-top:20px;"),
+                p("Cliquez sur une ligne pour localiser le patient sur les graphiques ci-dessus.", style="font-size:0.85em; color:#64748b; font-style:italic;"),
+                DTOutput("table_atypical")
+              ))
+            ),
+            uiOutput("heatmap_matutes_ui")
+          )
+        )
+      )
+    )
   ),
   
   tabPanel("2. DIAGNOSTIC",
-           sidebarLayout(
-             sidebarPanel(
-               h4("Saisie des Marqueurs (RFI)", style="font-weight: 700; color: #0f172a;"),
-               hr(),
-               uiOutput("dynamic_inputs"),
-               hr(),
-               actionButton("predict", " CALCULER PROBABILITÉ LLC", 
-                            class = "btn-success btn-lg btn-block", 
-                            style = "font-weight: 700; border-radius: 10px;",
-                            icon = icon("stethoscope")),
-               br(),
-               uiOutput("download_btn_ui")
-             ),
-             mainPanel(
-               uiOutput("result_box"),
-               br(),
-               uiOutput("patient_explain_ui")
-             )
-           )
+    sidebarLayout(
+      sidebarPanel(
+       h4("Saisie des Marqueurs (RFI)", style="font-weight: 700; color: #0f172a;"),
+        hr(),
+        uiOutput("dynamic_inputs"),
+        hr(),
+        actionButton("predict", " CALCULER PROBABILITÉ LLC", 
+                     class = "btn-success btn-lg btn-block", 
+                     style = "font-weight: 700; border-radius: 10px;",
+                     icon = icon("stethoscope")),
+        br(),
+        uiOutput("download_btn_ui")
+      ),
+      mainPanel(
+        uiOutput("result_box"),
+        br(),
+        uiOutput("patient_explain_ui")
+      )
+    )
   ),
   
   # --- ONGLET 3 : METHODOLOGY (MATHJAX INTEGRATION) ---
   tabPanel("3. METHODOLOGY",
-           withMathJax(
-             fluidPage(
-               div(class="modern-card", style="border-top: 5px solid #1e293b;",
-                   h3(icon("shield-alt"), " Algorithmic Architecture (TRIPOD-AI Compliant)", style="font-weight:700; color:#0f172a; margin-bottom: 20px;"),
-                   p("This computational pipeline is specifically engineered to mitigate optimism bias (overfitting) and prevent data leakage in small clinical cohorts. The architecture strictly segregates feature engineering, selection, and optimization within an impermeable Repeated Nested Cross-Validation framework.", style="font-size: 1.1em; color:#475569;"),
-                   
-                   div(style="text-align:center; padding: 25px; background: #f8fafc; border-radius: 12px; margin: 30px 0; border: 1px solid #e2e8f0;",
-                       div(class="flow-box", style="background:#3b82f6;", "1. Data Input"),
-                       div(class="flow-arrow", "↓"),
-                       div(class="flow-box", style="background:#8b5cf6;", "2. Repeated Nested Cross-Validation (Outer Folds)"),
-                       div(class="flow-arrow", "↓"),
-                       div(class="flow-inner", HTML("<b>Inner Loop (Training Folds Only):</b><br>Ratio Combinatorics → EPV Univariate Filter → Z-Score Scaling → Elastic-Net Optimization")),
-                       div(class="flow-arrow", "↓"),
-                       div(class="flow-box", style="background:#f59e0b;", "3. Out-Of-Bag Prediction & Bayesian Platt Scaling"),
-                       div(class="flow-arrow", "↓"),
-                       div(class="flow-box", style="background:#10b981;", "4. Final Frozen Models on 100% Training Cohort"),
-                       div(class="flow-arrow", "↓"),
-                       div(class="flow-box", style="background:#ef4444;", "5. SHAP & Conformal Bounds, HDBSCAN & Isolation Forest")
-                   ),
-                   
-                   hr(),
-                   h4("1. Repeated Nested-CV & Elastic-Net Model", style="font-weight:600; color:#2563eb;"),
-                   p("The algorithm utilizes a 5-fold Nested Cross-Validation repeated multiple times. An extensive feature-engineering procedure generates biologically relevant candidate variables. The selected variables subsequently entered into an Elastic-Net mMdel, which combines L1 and L2 regularization to identify the most predictive markers:"),
-                   p("$$ Penalty = \\lambda \\cdot \\left[ \\alpha ||\\beta||_1 + \\frac{1 - \\alpha}{2} ||\\beta||_2^2 \\right] $$"),
-                   br(),
-                   
-                   h4("2. Dimensionality Protection (EPV Filter)", style="font-weight:600; color:#2563eb;"),
-                   p("To minimize overfitting and prevent information leakage, a strict Events-Per-Variable (EPV) Filter is applied:"),
-                   p("$$ EPV = \\frac{N_{minority}}{N_{variables}} \\ge 5 $$"),
-                   p("To prevent data leakage, the EPV Filter is performed dynamically inside the training folds of the cross-validation loop. A strict minimum of 2 variables is enforced for multivariate suitability."),
-                   br(),
-                   
-                   h4("3. Z-score standardization", style="font-weight:600; color:#2563eb;"),
-                   p("The analytical pipeline begins by transforming each patient's raw cytometric measurements into standardized Z-score:"),
-                   p("$$ Z = \\frac{X - \\mu}{\\sigma} $$"),
-                   br(),
-                   
-                   h4("4. Out-Of-Bag Bayesian Calibration & Performance", style="font-weight:600; color:#2563eb;"),
-                   p("Every patient is assigned an averaged Out-Of-Bag (OOB) probability, subsequently smoothed via Bayesian logistic regression (Platt Scaling):"),
-                   p("$$ P(Y=1 | X) = \\frac{1}{1 + e^{-(A \\cdot \\text{logit}(P_{OOB}) + B)}} $$"),
-                   br(),
-                   
-                   h4("5. Independent External Validation", style="font-weight:600; color:#2563eb;"),
-                   p("External validation applies these exact frozen parameters as a rigid mathematical projector, unequivocally demonstrating trans-institutional comparability."),
-                   
-                   hr(),
-                   h3(icon("microchip"), " Version 2.4 Upgrades: Advanced XAI & Topography", style="font-weight:700; color:#0f172a; margin-top:30px; margin-bottom: 20px;"),
-                   
-                   h4("6. HDBSCAN Density-Based Clustering", style="font-weight:600; color:#8b5cf6;"),
-                   p("Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN) calculates clusters based on mutual reachability distance:"),
-                   p("$$ d_{mreach}(a,b) = \\max\\{core_k(a), core_k(b), d(a,b)\\} $$"),
-                   br(),
-                   
-                   h4("7. Isolation Forest", style="font-weight:600; color:#8b5cf6;"),
-                   p("Atypical patients are identified on UMAP using an Isolation Forest. It calculates an anomaly score based on the path length h(x) required to isolate a sample in random decision trees. An absolute anomaly threshold is defined using the 95th percentile of the training cohort and applied unconditionally to external validation:"),
-                   p("$$ s(x, n) = 2^{-\\frac{E(h(x))}{c(n)}} $$"),
-                   br(),
-                   
-                   h4("8. Local Log-Odds Explanations (XAI)", style="font-weight:600; color:#8b5cf6;"),
-                   p("Deconstructs the patient's predictive score by determining the exact linear contribution of each specific marker based on the final Elastic-Net coefficients:"),
-                   p("$$ Contribution_i = \\beta_i \\times Z_{x_i} $$"),
-                   br(),
-                   
-                   h4("9. Conformal Prediction", style="font-weight:600; color:#8b5cf6;"),
-                   p("Conformal prediction acts as a built-in safety mechanism for the AI. Instead of blindly trusting a single predictive score, it evaluates the model's certainty against a strict safety threshold that was calculated using the training cohort:"),
-                   p("$$ C(x_{n+1}) = \\{y \\in \\mathcal{Y} : \\hat{p}(y|x_{n+1}) \\ge 1 - \\hat{q}_{1-\\alpha}\\} $$")
-               )
-             )
-           )
+    withMathJax(
+      fluidPage(
+        div(class="modern-card", style="border-top: 5px solid #1e293b;",
+          h3(icon("shield-alt"), " Algorithmic Architecture (TRIPOD-AI Compliant)", style="font-weight:700; color:#0f172a; margin-bottom: 20px;"),
+          p("This computational pipeline is specifically engineered to mitigate optimism bias (overfitting) and prevent data leakage in small clinical cohorts. The architecture strictly segregates feature engineering, selection, and optimization within an impermeable Repeated Nested Cross-Validation framework.", style="font-size: 1.1em; color:#475569;"),
+          
+          div(style="text-align:center; padding: 25px; background: #f8fafc; border-radius: 12px; margin: 30px 0; border: 1px solid #e2e8f0;",
+             div(class="flow-box", style="background:#3b82f6;", "1. Data Input"),
+             div(class="flow-arrow", "↓"),
+             div(class="flow-box", style="background:#8b5cf6;", "2. Repeated Nested Cross-Validation (Outer Folds)"),
+             div(class="flow-arrow", "↓"),
+             div(class="flow-inner", HTML("<b>Inner Loop (Training Folds Only):</b><br>Ratio Combinatorics → EPV Univariate Filter → Z-Score Scaling → Elastic-Net Optimization")),
+             div(class="flow-arrow", "↓"),
+             div(class="flow-box", style="background:#f59e0b;", "3. Out-Of-Bag Prediction & Bayesian Platt Scaling"),
+             div(class="flow-arrow", "↓"),
+             div(class="flow-box", style="background:#10b981;", "4. Final Frozen Models on 100% Training Cohort"),
+             div(class="flow-arrow", "↓"),
+             div(class="flow-box", style="background:#ef4444;", "5. SHAP & Conformal Bounds, HDBSCAN & Isolation Forest")
+          ),
+          
+          hr(),
+          h4("1. Repeated Nested-CV & Elastic-Net Model", style="font-weight:600; color:#2563eb;"),
+          p("The algorithm utilizes a 5-fold Nested Cross-Validation repeated multiple times. An extensive feature-engineering procedure generates biologically relevant candidate variables. The selected variables subsequently entered into an Elastic-Net model, which combines L1 and L2 regularization to identify the most predictive markers:"),
+          p("$$ Penalty = \\lambda \\cdot \\left[ \\alpha ||\\beta||_1 + \\frac{1 - \\alpha}{2} ||\\beta||_2^2 \\right] $$"),
+          br(),
+ 
+          h4("2. Dimensionality Protection (EPV Filter)", style="font-weight:600; color:#2563eb;"),
+         p("To minimize overfitting and prevent information leakage, a strict Events-Per-Variable (EPV) Filter is applied:"),
+          p("$$ EPV = \\frac{N_{minority}}{N_{variables}} \\ge 5 $$"),
+          p("To prevent data leakage, the EPV Filter is performed dynamically inside the training folds of the cross-validation loop. A strict minimum of 2 variables is enforced for multivariate suitability."),
+          br(),
+ 
+          h4("3. Z-score standardization", style="font-weight:600; color:#2563eb;"),
+          p("The analytical pipeline begins by transforming each patient's raw cytometric measurements into standardized Z-score:"),
+          p("$$ Z = \\frac{X - \\mu}{\\sigma} $$"),
+          br(),
+          
+          h4("4. Out-Of-Bag Bayesian Calibration & Performance", style="font-weight:600; color:#2563eb;"),
+          p("Every patient is assigned an averaged Out-Of-Bag (OOB) probability, subsequently smoothed via Bayesian logistic regression (Platt Scaling):"),
+          p("$$ P(Y=1 | X) = \\frac{1}{1 + e^{-(A \\cdot \\text{logit}(P_{OOB}) + B)}} $$"),
+          br(),
+          
+          h4("5. Independent External Validation", style="font-weight:600; color:#2563eb;"),
+          p("External validation applies these exact frozen parameters as a rigid mathematical projector, unequivocally demonstrating trans-institutional comparability."),
+          
+          hr(),
+          h3(icon("microchip"), " Version 2.4 Upgrades: Advanced XAI & Topography", style="font-weight:700; color:#0f172a; margin-top:30px; margin-bottom: 20px;"),
+ 
+          h4("6. HDBSCAN Density-Based Clustering", style="font-weight:600; color:#8b5cf6;"),
+          p("Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN) calculates clusters based on mutual reachability distance:"),
+          p("$$ d_{mreach}(a,b) = \\max\\{core_k(a), core_k(b), d(a,b)\\} $$"),
+          br(),
+ 
+          h4("7. Isolation Forest", style="font-weight:600; color:#8b5cf6;"),
+          p("Atypical patients are identified on UMAP using an Isolation Forest. It calculates an anomaly score based on the path length h(x) required to isolate a sample in random decision trees. An absolute anomaly threshold is defined using the 95th percentile of the training cohort and applied unconditionally to external validation:"),
+          p("$$ s(x, n) = 2^{-\\frac{E(h(x))}{c(n)}} $$"),
+          br(),
+          
+          h4("8. Local Log-Odds Explanations (XAI)", style="font-weight:600; color:#8b5cf6;"),
+          p("Deconstructs the patient's predictive score by determining the exact linear contribution of each specific marker based on the final Elastic-Net coefficients:"),
+          p("$$ Contribution_i = \\beta_i \\times Z_{x_i} $$"),
+          br(),
+ 
+          h4("9. Conformal Prediction", style="font-weight:600; color:#8b5cf6;"),
+          p("Conformal prediction acts as a built-in safety mechanism for the AI. Instead of blindly trusting a single predictive score, it evaluates the model's certainty against a strict safety threshold that was calculated using the training cohort:"),
+          p("$$ C(x_{n+1}) = \\{y \\in \\mathcal{Y} : \\hat{p}(y|x_{n+1}) \\ge 1 - \\hat{q}_{1-\\alpha}\\} $$")
+        )
+      )
+    )
   )
 )
-
+ 
 # --- SERVEUR ---
 server <- function(input, output, session) {
   
@@ -252,7 +257,7 @@ server <- function(input, output, session) {
       div(div(class = "modal-success-icon", icon("check-circle")),
           div(class = "modal-premium-title", title),
           div(class = "modal-premium-body", text),
-          tags$script(HTML("setTimeout(function() { $('.modal').modal('hide'); }, 2200);")))
+     tags$script(HTML("setTimeout(function() { $('.modal').modal('hide'); }, 2200);")))
     ))
   }
   
@@ -278,8 +283,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$file_ext, {
-    req(input$file_ext)
-    show_premium_popup("Cohorte Importée ", "Cohorte de validation externe chargée avec succès.")
+   req(input$file_ext)
+   show_premium_popup("Cohorte Importée ", "Cohorte de validation externe chargée avec succès.")
   })
   
   observeEvent(input$update_model, {
@@ -287,7 +292,7 @@ server <- function(input, output, session) {
     set.seed(42)
     selected_patient(NULL) 
     
-    withProgress(message = 'Modélisation TRIPOD-AI en cours...', value = 0, {
+   withProgress(message = 'Modélisation TRIPOD-AI en cours...', value = 0, {
       
       incProgress(0.1, detail = "Nettoyage des données...")
       df <- m_res$df_train 
@@ -329,48 +334,48 @@ server <- function(input, output, session) {
           # Génération temporaire des features pour cette configuration
           x_temp <- x_raw_base_expanded
           if(c_simp || c_all) {
-            pairs <- combn(m_res$marker_names, 2)
-            nb_pairs <- ncol(pairs)
-            num_trans <- if(c_all) 4 else 1
-            ratio_matrix <- matrix(nrow = nrow(x_raw_base), ncol = nb_pairs * num_trans)
-            idx <- 1
-            for(j in 1:nb_pairs) {
-              A <- x_raw_base[, pairs[1, j]]; B <- x_raw_base[, pairs[2, j]]
-              ratio_matrix[, idx] <- (A + 1e-6) / (B + 1e-6); idx <- idx + 1
-              if(c_all) {
-                ratio_matrix[, idx] <- A / (A + B + 1e-6); idx <- idx + 1
-                ratio_matrix[, idx] <- log((A + 1e-6) / (B + 1e-6)); idx <- idx + 1
-                ratio_matrix[, idx] <- (A - B) / (A + B + 1e-6); idx <- idx + 1
-              }
-            }
-            x_temp <- cbind(x_raw_base_expanded, ratio_matrix)
+             pairs <- combn(m_res$marker_names, 2)
+             nb_pairs <- ncol(pairs)
+             num_trans <- if(c_all) 4 else 1
+             ratio_matrix <- matrix(nrow = nrow(x_raw_base), ncol = nb_pairs * num_trans)
+             idx <- 1
+             for(j in 1:nb_pairs) {
+                A <- x_raw_base[, pairs[1, j]]; B <- x_raw_base[, pairs[2, j]]
+                ratio_matrix[, idx] <- (A + 1e-6) / (B + 1e-6); idx <- idx + 1
+                if(c_all) {
+                   ratio_matrix[, idx] <- A / (A + B + 1e-6); idx <- idx + 1
+                   ratio_matrix[, idx] <- log((A + 1e-6) / (B + 1e-6)); idx <- idx + 1
+                  ratio_matrix[, idx] <- (A - B) / (A + B + 1e-6); idx <- idx + 1
+                }
+             }
+             x_temp <- cbind(x_raw_base_expanded, ratio_matrix)
           }
           
           # Simulation 5-fold rapide
           p_oof <- numeric(length(y))
           for(k in 1:5) {
-            test_idx  <- which(folds_fast == k)
-            train_idx <- which(folds_fast != k)
-            x_tr <- x_temp[train_idx, , drop=FALSE]; y_tr <- y[train_idx]
-            x_te <- x_temp[test_idx, , drop=FALSE]
-            
-            if(c_epv) {
-              n_events <- min(sum(y_tr == 1), sum(y_tr == 0))
-              max_vars <- max(2, floor(n_events / 5)) 
-              abs_cor <- apply(x_tr, 2, function(col_vec) { if(sd(col_vec)==0) return(0); abs(cor(col_vec, y_tr)) })
-              sel_cols <- order(abs_cor, decreasing = TRUE)[1:min(length(abs_cor), max_vars)]
-            } else { sel_cols <- 1:ncol(x_tr) }
-            
-            x_tr <- x_tr[, sel_cols, drop=FALSE]; x_te <- x_te[, sel_cols, drop=FALSE]
-            ctr <- colMeans(x_tr); sdt <- apply(x_tr, 2, sd); sdt[sdt==0] <- 1
-            x_tr_sc <- scale(x_tr, center=ctr, scale=sdt)
-            x_te_sc <- scale(x_te, center=ctr, scale=sdt)
-            
-            wtr <- rep(1, length(y_tr))
-            if(input$use_weights) { wtr[y_tr == 1] <- length(y_tr)/(2*sum(y_tr==1)); wtr[y_tr == 0] <- length(y_tr)/(2*sum(y_tr==0)) }
-            
-            fit_fast <- suppressWarnings(cv.glmnet(x_tr_sc, y_tr, family="binomial", alpha=0.5, weights=wtr, nfolds=3))
-            p_oof[test_idx] <- as.numeric(predict(fit_fast, newx=x_te_sc, s="lambda.min", type="response"))
+             test_idx  <- which(folds_fast == k)
+             train_idx <- which(folds_fast != k)
+             x_tr <- x_temp[train_idx, , drop=FALSE]; y_tr <- y[train_idx]
+             x_te <- x_temp[test_idx, , drop=FALSE]
+             
+             if(c_epv) {
+                n_events <- min(sum(y_tr == 1), sum(y_tr == 0))
+                max_vars <- max(2, floor(n_events / 5)) 
+                abs_cor <- apply(x_tr, 2, function(col_vec) { if(sd(col_vec)==0) return(0); abs(cor(col_vec, y_tr)) })
+                sel_cols <- order(abs_cor, decreasing = TRUE)[1:min(length(abs_cor), max_vars)]
+             } else { sel_cols <- 1:ncol(x_tr) }
+             
+             x_tr <- x_tr[, sel_cols, drop=FALSE]; x_te <- x_te[, sel_cols, drop=FALSE]
+             ctr <- colMeans(x_tr); sdt <- apply(x_tr, 2, sd); sdt[sdt==0] <- 1
+             x_tr_sc <- scale(x_tr, center=ctr, scale=sdt)
+             x_te_sc <- scale(x_te, center=ctr, scale=sdt)
+             
+             wtr <- rep(1, length(y_tr))
+             if(input$use_weights) { wtr[y_tr == 1] <- length(y_tr)/(2*sum(y_tr==1)); wtr[y_tr == 0] <- length(y_tr)/(2*sum(y_tr==0)) }
+             
+             fit_fast <- suppressWarnings(cv.glmnet(x_tr_sc, y_tr, family="binomial", alpha=0.5, weights=wtr, nfolds=3))
+             p_oof[test_idx] <- as.numeric(predict(fit_fast, newx=x_te_sc, s="lambda.min", type="response"))
           }
           
           roc_temp <- suppressWarnings(pROC::roc(y, p_oof, quiet=TRUE))
@@ -386,7 +391,7 @@ server <- function(input, output, session) {
         do_simple_ratios <- grid$simple[best_row]
         do_all_ratios <- grid$all[best_row]
         do_epv <- grid$epv[best_row]
-        m_res$automl_msg <- paste0("⚡ Grid-Search Terminé : Configuration retenue [Ratios Simples: ", do_simple_ratios, " | Ratios Complets: ", do_all_ratios, " | Filtre EPV: ", do_epv, "] (AUC Inner-Fold: ", round(best_auc,3), ")")
+        m_res$automl_msg <- paste0("⚡ Grid-Search Terminé : Configuration retenue [Variables Simples: ", do_simple_ratios, " | Toutes combinaisons: ", do_all_ratios, " | Filtre EPV: ", do_epv, "] (AUC Inner-Fold: ", round(best_auc,3), ")")
       }
       # --- FIN LOGIQUE AUTO-ML ---
       
@@ -410,9 +415,9 @@ server <- function(input, output, session) {
           
           ratio_matrix[, idx] <- (A + eps) / (B + eps)
           ratio_names[idx] <- paste0(pairs[1, i], "_sur_", pairs[2, i])
-          idx <- idx + 1
+         idx <- idx + 1
           
-          if(do_all_ratios) {
+         if(do_all_ratios) {
             ratio_matrix[, idx] <- A / (A + B + eps)
             ratio_names[idx] <- paste0(pairs[1, i], "_sursum_", pairs[2, i])
             idx <- idx + 1
@@ -426,7 +431,7 @@ server <- function(input, output, session) {
             idx <- idx + 1
           }
         }
-        colnames(ratio_matrix) <- ratio_names
+      colnames(ratio_matrix) <- ratio_names
         x_raw_all <- cbind(x_raw_base_expanded, ratio_matrix)
       } else {
         x_raw_all <- x_raw_base_expanded
@@ -471,14 +476,14 @@ server <- function(input, output, session) {
           }
           
           x_net <- x_net_full[, selected_cols, drop=F]
-          x_cal <- x_cal_full[, selected_cols, drop=F]
+        x_cal <- x_cal_full[, selected_cols, drop=F]
           x_te <- x_te_full[, selected_cols, drop=F]
           
-          ctr <- colMeans(x_net); sdt <- apply(x_net, 2, sd); sdt[sdt==0] <- 1
+         ctr <- colMeans(x_net); sdt <- apply(x_net, 2, sd); sdt[sdt==0] <- 1
           x_net_sc <- scale(x_net, center=ctr, scale=sdt)
           x_cal_sc <- scale(x_cal, center=ctr, scale=sdt)
           x_te_sc  <- scale(x_te, center=ctr, scale=sdt)
-          
+         
           wtr <- rep(1, length(y_net))
           if(input$use_weights) {
             wtr[y_net == 1] <- length(y_net) / (2 * sum(y_net == 1))
@@ -496,7 +501,7 @@ server <- function(input, output, session) {
           
           fold_coefs <- as.matrix(coef(cv_fit, s="lambda.min"))
           nonzero_vars <- rownames(fold_coefs)[fold_coefs[,1] != 0]
-          cv_selected_features[[feature_list_idx]] <- setdiff(nonzero_vars, "(Intercept)")
+       cv_selected_features[[feature_list_idx]] <- setdiff(nonzero_vars, "(Intercept)")
           feature_list_idx <- feature_list_idx + 1
           
           p_cal <- as.numeric(predict(cv_fit, newx=x_cal_sc, s="lambda.min", type="response"))
@@ -512,11 +517,11 @@ server <- function(input, output, session) {
       probs_cv <- rowMeans(probs_cv_matrix)
       
       incProgress(0.6, detail = "Modèle global & Calibration OOB...")
-      y_net_final <- y
+     y_net_final <- y
       
       if(do_epv) {
         n_events_min_global <- min(sum(y_net_final == 1), sum(y_net_final == 0))
-        max_allowed_vars_global <- max(2, floor(n_events_min_global / 5)) 
+       max_allowed_vars_global <- max(2, floor(n_events_min_global / 5)) 
         
         abs_cor_global <- apply(x_raw_all, 2, function(col_vec) {
           if(sd(col_vec) == 0) return(0)
@@ -557,7 +562,7 @@ server <- function(input, output, session) {
       m_res$roc_obj <- roc(y, probs_calib_finales, quiet=TRUE)
       
       nc_scores <- 1 - ifelse(y == 1, probs_calib_finales, 1 - probs_calib_finales)
-      m_res$q_conformal <- quantile(nc_scores, 0.95, na.rm=TRUE)
+     m_res$q_conformal <- quantile(nc_scores, 0.95, na.rm=TRUE)
       
       auc_ci <- as.numeric(ci.auc(m_res$roc_obj))
       
@@ -574,7 +579,7 @@ server <- function(input, output, session) {
         sens = tp/(tp+fn), sens_lower = sens_ci[1], sens_upper = sens_ci[2],
         spec = tn/(tn+fp), spec_lower = spec_ci[1], spec_upper = spec_ci[2],
         brier = mean((probs_calib_finales - y)^2), 
-        calib_intercept = coef(m_res$calib_model)[1], 
+       calib_intercept = coef(m_res$calib_model)[1], 
         calib_slope = coef(m_res$calib_model)[2],
         ICI = mean(abs(probs_calib_finales - predict(suppressWarnings(loess(y ~ probs_calib_finales, degree=2)), probs_calib_finales)), na.rm=T),
         Emax = max(abs(probs_calib_finales - predict(suppressWarnings(loess(y ~ probs_calib_finales, degree=2)), probs_calib_finales)), na.rm=T)
@@ -603,7 +608,7 @@ server <- function(input, output, session) {
       m_res$df_coef_export <- subset(df_coef, Poids != 0)
       
       roc_list <- list("Apprentissage (OOB)" = m_res$roc_obj)
-      df_pr_comb <- data.frame(Recall = pr_obj$curve[,1], Precision = pr_obj$curve[,2], Cohorte = "Apprentissage (OOB)")
+     df_pr_comb <- data.frame(Recall = pr_obj$curve[,1], Precision = pr_obj$curve[,2], Cohorte = "Apprentissage (OOB)")
       df_calib_comb <- data.frame(p = probs_calib_finales, y = y, Cohorte = "Apprentissage (OOB)")
       
       thresholds <- seq(0, 0.99, by=0.01)
@@ -633,7 +638,7 @@ server <- function(input, output, session) {
           y_ext <- as.numeric(df_ext[[target_col]])
           
           x_ext_all_raw <- matrix(0, nrow = nrow(df_ext), ncol = length(m_res$scale_center))
-          colnames(x_ext_all_raw) <- names(m_res$scale_center)
+         colnames(x_ext_all_raw) <- names(m_res$scale_center)
           
           for(v in colnames(x_ext_all_raw)) {
             if(grepl("_sursum_", v)) {
@@ -651,7 +656,7 @@ server <- function(input, output, session) {
             } else {
               if(v %in% names(df_ext)) x_ext_all_raw[, v] <- as.numeric(df_ext[[v]])
             }
-          }
+         }
           
           x_ext_full_sc <- scale(x_ext_all_raw, center = m_res$scale_center, scale = m_res$scale_std)
           p_e_raw <- as.numeric(predict(m_res$fit, newx=x_ext_full_sc, type="response"))
@@ -666,10 +671,10 @@ server <- function(input, output, session) {
           tn_e <- sum(p_e_cal<0.5 & y_ext==0)
           fp_e <- sum(p_e_cal>=0.5 & y_ext==0)
           
-          sens_e_ci <- binom.test(tp_e, tp_e+fn_e)$conf.int
+         sens_e_ci <- binom.test(tp_e, tp_e+fn_e)$conf.int
           spec_e_ci <- binom.test(tn_e, tn_e+fp_e)$conf.int
           
-          m_res$ext_metrics <- list(
+        m_res$ext_metrics <- list(
             auc_val = auc_ext_ci[2], auc_lower = auc_ext_ci[1], auc_upper = auc_ext_ci[3],
             pr_auc = pr_obj_ext$auc.integral,
             sens = tp_e/(tp_e+fn_e), sens_lower = sens_e_ci[1], sens_upper = sens_e_ci[2],
@@ -677,9 +682,9 @@ server <- function(input, output, session) {
             brier = mean((p_e_cal - y_ext)^2)
           )
           
-          roc_list[["Validation Externe"]] <- roc_ext
+        roc_list[["Validation Externe"]] <- roc_ext
           df_pr_comb <- rbind(df_pr_comb, data.frame(Recall = pr_obj_ext$curve[,1], Precision = pr_obj_ext$curve[,2], Cohorte = "Validation Externe"))
-          df_calib_comb <- rbind(df_calib_comb, data.frame(p = p_e_cal, y = y_ext, Cohorte = "Validation Externe"))
+         df_calib_comb <- rbind(df_calib_comb, data.frame(p = p_e_cal, y = y_ext, Cohorte = "Validation Externe"))
           
           prev_ext <- mean(y_ext == 1)
           nb_model_ext <- sapply(thresholds, function(pt) {
@@ -689,7 +694,7 @@ server <- function(input, output, session) {
           })
           df_dca_comb <- rbind(df_dca_comb, data.frame(Threshold = rep(thresholds, 2), NB = c(nb_model_ext, sapply(thresholds, function(pt) { prev_ext - (1 - prev_ext) * (pt / (1 - pt)) })), Type = rep(c("Modèle (Externe)", "Treat all (Externe)"), each=length(thresholds))))
           
-          x_comb_sc <- rbind(x_comb_sc, x_ext_full_sc)
+         x_comb_sc <- rbind(x_comb_sc, x_ext_full_sc)
           y_comb <- c(y_comb, y_ext)
           id_ext <- if("ID_Interne" %in% names(df_ext)) df_ext$ID_Interne else paste0("Ext_", 1:nrow(x_ext_full_sc))
           id_comb <- c(id_comb, id_ext)
@@ -708,18 +713,18 @@ server <- function(input, output, session) {
         scale_color_manual(values = c("Apprentissage (OOB)" = "#10b981", "Validation Externe" = "#3b82f6")) +
         theme_minimal() + 
         labs(x="Sensibilité (Recall)", y="VPP (Precision)", color = "Cohorte")
-      
+ 
       m_res$plot_calib_ggplot <- ggplot(df_calib_comb, aes(x = p, y = y, color = Cohorte)) +
         geom_point(alpha = 0.2, size=1.5) + geom_smooth(method = "loess", se = FALSE, linewidth=1.2) + 
         geom_abline(slope = 1, intercept = 0, linetype = "dashed", color="#94a3b8") +
         scale_color_manual(values = c("Apprentissage (OOB)" = "#10b981", "Validation Externe" = "#3b82f6")) +
-        theme_minimal() + labs(x = "Probabilité prédite", y = "Diagnostic")
-      
+       theme_minimal() + labs(x = "Probabilité prédite", y = "Diagnostic")
+        
       m_res$plot_dca_ggplot <- ggplot(df_dca_comb, aes(x=Threshold, y=NB, color=Type, linetype=Type, linewidth=Type)) +
         geom_line() + coord_cartesian(ylim=c(-0.05, max(nb_model_int, na.rm=T)+0.05)) +
-        scale_color_manual(values=c("Modèle (Apprentissage)"="#10b981", "Treat all (Apprentissage)"="#a7f3d0", "Modèle (Externe)"="#3b82f6", "Treat all (Externe)"="#93c5fd", "Treat none"="#e2e8f0")) +
-        scale_linetype_manual(values=c("Modèle (Apprentissage)"="solid", "Treat all (Apprentissage)"="dotted", "Modèle (Externe)"="solid", "Treat all (Externe)"="dotted", "Treat none"="solid")) +
-        scale_linewidth_manual(values=c("Modèle (Apprentissage)"=1.5, "Treat all (Apprentissage)"=0.8, "Modèle (Externe)"=1.5, "Treat all (Externe)"=0.8, "Treat none"=0.8)) +
+       scale_color_manual(values=c("Modèle (Apprentissage)"="#10b981", "Treat all (Apprentissage)"="#a7f3d0", "Modèle (Externe)"="#3b82f6", "Treat all (Externe)"="#93c5fd", "Treat none"="#e2e8f0")) +
+       scale_linetype_manual(values=c("Modèle (Apprentissage)"="solid", "Treat all (Apprentissage)"="dotted", "Modèle (Externe)"="solid", "Treat all (Externe)"="dotted", "Treat none"="solid")) +
+    scale_linewidth_manual(values=c("Modèle (Apprentissage)"=1.5, "Treat all (Apprentissage)"=0.8, "Modèle (Externe)"=1.5, "Treat all (Externe)"=0.8, "Treat none"=0.8)) +
         theme_minimal() + labs(x="Seuil de Probabilité", y="Net Benefit")
       
       probs_autre <- probs_calib_finales[y == 0]
@@ -742,12 +747,12 @@ server <- function(input, output, session) {
       
       mat_comb <- rep(NA, length(y_comb))
       if("Matutes" %in% names(df)) {
-        mat_comb[1:length(y)] <- suppressWarnings(as.numeric(as.character(df$Matutes)))
+         mat_comb[1:length(y)] <- suppressWarnings(as.numeric(as.character(df$Matutes)))
       }
       if (!is.null(input$file_ext)) {
-        if (exists("df_ext") && "Matutes" %in% names(df_ext)) {
+         if (exists("df_ext") && "Matutes" %in% names(df_ext)) {
           mat_comb[(length(y)+1):length(y_comb)] <- suppressWarnings(as.numeric(as.character(df_ext$Matutes)))
-        }
+         }
       }
       
       # --- FIX ISOLATION FOREST : SEUIL ABSOLU ENTRAÎNEMENT ---
@@ -768,8 +773,8 @@ server <- function(input, output, session) {
           z_scores_intra[idx_g, ] <- scale(mat_g, center=mu_g, scale=sd_g)
         }
       }
-      m_res$z_scores_intra <- z_scores_intra
-      m_res$x_std_matrix_comb <- x_comb_sc 
+     m_res$z_scores_intra <- z_scores_intra
+     m_res$x_std_matrix_comb <- x_comb_sc 
       
       m_res$df_plot_pca <- data.frame(
         RowIndex = 1:nrow(x_comb_sc), 
@@ -785,8 +790,8 @@ server <- function(input, output, session) {
       )
       
       m_res$df_plot_pca$Couleur_Groupe <- ifelse(!is.na(m_res$df_plot_pca$Matutes) & m_res$df_plot_pca$Matutes == 3, "Matutes 3 (Rouge)", 
-                                                 ifelse(m_res$df_plot_pca$Atypique, "Atypique (Violet)", 
-                                                        ifelse(m_res$df_plot_pca$Cohorte == "Apprentissage", "Apprentissage (Vert)", "Validation (Bleu)")))
+                                         ifelse(m_res$df_plot_pca$Atypique, "Atypique (Violet)", 
+                                                ifelse(m_res$df_plot_pca$Cohorte == "Apprentissage", "Apprentissage (Vert)", "Validation (Bleu)")))
       
       df_all_patients <- data.frame(
         Cohorte = cohorte_comb,
@@ -831,21 +836,21 @@ server <- function(input, output, session) {
         
         mat3_idx <- which(df_reclass$Matutes == 3)
         if(length(mat3_idx) > 1) {
-          x_mat3 <- x_net_final_sc[mat3_idx, , drop=FALSE]
-          mat3_annot <- data.frame(Diagnostic = ifelse(y[mat3_idx] == 1, "LLC", "Autre"))
-          rownames(mat3_annot) <- df$ID_Interne[mat3_idx]
-          rownames(x_mat3) <- df$ID_Interne[mat3_idx]
-          
-          m_res$plot_heatmap <- pheatmap::pheatmap(
-            x_mat3,
-            annotation_row = mat3_annot,
-            color = colorRampPalette(c("#3b82f6", "white", "#ef4444"))(50),
-            main = "",
-            silent = TRUE
-          )
-          m_res$show_heatmap <- TRUE
+            x_mat3 <- x_net_final_sc[mat3_idx, , drop=FALSE]
+            mat3_annot <- data.frame(Diagnostic = ifelse(y[mat3_idx] == 1, "LLC", "Autre"))
+            rownames(mat3_annot) <- df$ID_Interne[mat3_idx]
+            rownames(x_mat3) <- df$ID_Interne[mat3_idx]
+            
+            m_res$plot_heatmap <- pheatmap::pheatmap(
+                x_mat3,
+                annotation_row = mat3_annot,
+                color = colorRampPalette(c("#3b82f6", "white", "#ef4444"))(50),
+                main = "",
+                silent = TRUE
+            )
+            m_res$show_heatmap <- TRUE
         } else {
-          m_res$show_heatmap <- FALSE
+            m_res$show_heatmap <- FALSE
         }
         
         roc_matutes <- suppressWarnings(pROC::roc(y, mat_clean, direction = "<", quiet = TRUE))
@@ -869,7 +874,7 @@ server <- function(input, output, session) {
         
         nri_total <- round((nri_event + nri_nonevent) * 100, 1)
         nri_lower <- round(((nri_event + nri_nonevent) - 1.96 * se_nri) * 100, 1)
-        nri_upper <- round(((nri_event + nri_nonevent) + 1.96 * se_nri) * 100, 1)
+       nri_upper <- round(((nri_event + nri_nonevent) + 1.96 * se_nri) * 100, 1)
         
         pval_str <- if(pval_delong < 0.05) paste0(format.pval(pval_delong, digits=3), " (Significatif)") else paste0(format.pval(pval_delong, digits=3), " (Non significatif, effet plafond sur les cas évidents)")
         
@@ -877,9 +882,9 @@ server <- function(input, output, session) {
           "<div style='background:#f5f3ff; border:1px solid #ddd6fe; padding:15px; border-radius:8px; margin-bottom:15px;'>",
           "<h5 style='color:#7c3aed; font-weight:bold; margin-top:0;'>Analyse Statistique de Supériorité</h5>",
           "<ul style='margin-bottom:0; color:#4c1d95; font-size:0.95em;'>",
-          "<li><b>Net Reclassification Improvement (NRI) : <span style='color:", ifelse(nri_total>0, "#10b981", "#ef4444"), ";'>", ifelse(nri_total>0, "+", ""), nri_total, "%</span> <span style='font-size:0.85em;'>[IC 95% : ", nri_lower, "% à ", nri_upper, "%]</span></b><br>Mesure l'amélioration nette du classement diagnostique par rapport au score de Matutes initial.</li>",
+          "<li><b>Net Reclassification Improvement (NRI) : <span style='color:", ifelse(nri_total>0, "#10b981", "#ef4444"), "'>", ifelse(nri_total>0, "+", ""), nri_total, "%</span> <span style='font-size:0.85em;'>[IC 95% : ", nri_lower, "% à ", nri_upper, "%]</span></b><br>Mesure l'amélioration nette du classement diagnostique par rapport au score de Matutes initial.</li>",
           "<li style='margin-top:8px;'><b>Test de DeLong (Différence d'AUC) : p-value = ", pval_str, "</b></li>",
-          "</ul></div>"
+      "</ul></div>"
         )
         
         t_html <- "<table class='table table-hover reclass-table' style='background:white; font-size:0.9em; width:100%;'>"
@@ -900,7 +905,7 @@ server <- function(input, output, session) {
           
           rouge_llc <- sum(sub_df$Prob_AI < m_res$seuil_bas & sub_df$Truth == "LLC")
           rouge_autre <- sum(sub_df$Prob_AI < m_res$seuil_bas & sub_df$Truth == "Autre")
-          jaune_llc <- sum(sub_df$Prob_AI >= m_res$seuil_bas & sub_df$Prob_AI <= m_res$seuil_haut & sub_df$Truth == "LLC")
+         jaune_llc <- sum(sub_df$Prob_AI >= m_res$seuil_bas & sub_df$Prob_AI <= m_res$seuil_haut & sub_df$Truth == "LLC")
           jaune_autre <- sum(sub_df$Prob_AI >= m_res$seuil_bas & sub_df$Prob_AI <= m_res$seuil_haut & sub_df$Truth == "Autre")
           vert_llc <- sum(sub_df$Prob_AI > m_res$seuil_haut & sub_df$Truth == "LLC")
           vert_autre <- sum(sub_df$Prob_AI > m_res$seuil_haut & sub_df$Truth == "Autre")
@@ -911,14 +916,14 @@ server <- function(input, output, session) {
           
           t_html <- paste0(t_html, "<tr><td style='border-color:#e2e8f0;'><b>", g, "</b><br>N=", n_tot, "</td><td style='border-color:#e2e8f0;'>", diag_str, "</td><td style='background:#fef2f2; border-color:#e2e8f0;'>", str_rouge, "</td><td style='background:#fffbeb; border-color:#e2e8f0;'>", str_jaune, "</td><td style='background:#f0fdf4; border-color:#e2e8f0;'>", str_vert, "</td></tr>")
         }
-        t_html <- paste0(t_html, "</tbody></table>")
+      t_html <- paste0(t_html, "</tbody></table>")
         m_res$table_matutes_html <- t_html
         
       } else {
         m_res$table_matutes_html <- NULL
       }
       
-      show_premium_popup("Modélisation Terminée", "Calculs effectués avec succès.")
+  show_premium_popup("Modélisation Terminée", "Calculs effectués avec succès.")
     })
   })
   
@@ -933,7 +938,7 @@ server <- function(input, output, session) {
       selected_patient(NULL)
     }
   })
-  
+ 
   # Depuis Matutes
   observeEvent(input$plot_matutes_click, {
     clicked_pt <- nearPoints(m_res$df_reclass, input$plot_matutes_click, xvar = "X_jitter", yvar = "Prob_AI", maxpoints = 1, threshold = 15)
@@ -943,16 +948,16 @@ server <- function(input, output, session) {
       selected_patient(NULL)
     }
   })
-  
+ 
   # Depuis Tableau Atypiques
-  observeEvent(input$table_recap_atypiques_rows_selected, {
+ observeEvent(input$table_recap_atypiques_rows_selected, {
     idx <- input$table_recap_atypiques_rows_selected
     if(length(idx) > 0) {
       id <- m_res$df_recap_export$ID_Interne[idx]
       if(!identical(selected_patient(), id)) selected_patient(id)
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
-  
+ 
   # Depuis Tableau Complet
   observeEvent(input$table_atypical_rows_selected, {
     idx <- input$table_atypical_rows_selected
@@ -961,7 +966,7 @@ server <- function(input, output, session) {
       if(!identical(selected_patient(), id)) selected_patient(id)
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
-  
+ 
   # Propagation de la sélection dans les DataTables
   observeEvent(selected_patient(), {
     id <- selected_patient()
@@ -983,9 +988,9 @@ server <- function(input, output, session) {
       }
     }
   }, ignoreNULL = FALSE)
-  
-  output$patient_count_ui <- renderUI({
-    req(m_res$df_train)
+ 
+ output$patient_count_ui <- renderUI({
+   req(m_res$df_train)
     df <- m_res$df_train; target_col <- if("LLC_1" %in% names(df)) "LLC_1" else "LLC"
     y <- as.numeric(df[[target_col]]); n_pat <- nrow(df); n_events <- min(sum(y == 1, na.rm=TRUE), sum(y == 0, na.rm=TRUE))
     df_numeric <- df[, sapply(df, is.numeric)]
@@ -1009,8 +1014,8 @@ server <- function(input, output, session) {
     }
     
     html_out <- div(class = "modern-card", style = paste0("border-left: 5px solid ", status_color, "; background-color: ", status_bg, "; padding: 18px; margin-bottom: 25px;"),
-                    h5(status_text, style=paste0("font-weight:800; color:", status_color, "; margin-top:0;")),
-                    p(HTML(paste0("Cohorte : <b>", n_pat, "</b> patients inclus, avec <b>", n_events, "</b> événements de la classe minoritaire pour <b>", n_preds, "</b> candidats prédicteurs. ", advice)), style="margin-bottom:0; color:#334155; font-size:1.05em;")
+        h5(status_text, style=paste0("font-weight:800; color:", status_color, "; margin-top:0;")),
+        p(HTML(paste0("Cohorte : <b>", n_pat, "</b> patients inclus, avec <b>", n_events, "</b> événements de la classe minoritaire pour <b>", n_preds, "</b> candidats prédicteurs. ", advice)), style="margin-bottom:0; color:#334155; font-size:1.05em;")
     )
     
     # Ajout du badge AutoML si activé
@@ -1020,7 +1025,7 @@ server <- function(input, output, session) {
     
     return(html_out)
   })
-  
+ 
   output$metrics_ui <- renderUI({
     req(m_res$metrics)
     div(class = "modern-card train-panel", fluidRow(
@@ -1030,7 +1035,7 @@ server <- function(input, output, session) {
     ))
   })
   
-  output$nature_metrics_ui <- renderUI({
+ output$nature_metrics_ui <- renderUI({
     req(m_res$metrics, m_res$pr_auc)
     div(class = "modern-card nature-panel", h5("MÉTRIQUES AVANCÉES OOB", style="font-weight:700; color:#8b5cf6; margin-bottom:15px;"), fluidRow(
       column(4, div(class='sub-metric', "PR-AUC", span(class='ideal-val', " (idéal ~1)")), div(class='big-metric', round(m_res$pr_auc, 3), style="font-size:1.6rem;")),
@@ -1055,9 +1060,9 @@ server <- function(input, output, session) {
     req(m_res$ext_metrics, m_res$roc_obj)
     diff_auc <- m_res$ext_metrics$auc_val - as.numeric(pROC::auc(m_res$roc_obj))
     is_normal_gap <- (diff_auc >= -0.02 && diff_auc <= 0.12)
-    div(class = "modern-card", style = if(is_normal_gap) "border-left: 5px solid #10b981; background-color: #f0fdf4;" else "border-left: 5px solid #f59e0b; background-color: #fffbeb;", 
+   div(class = "modern-card", style = if(is_normal_gap) "border-left: 5px solid #10b981; background-color: #f0fdf4;" else "border-left: 5px solid #f59e0b; background-color: #fffbeb;", 
         h5("COMPARAISON DES COHORTES", style="font-weight:700;"), p(paste0("Écart d'AUC : ", round(diff_auc, 3))),
-        if(is_normal_gap) p("✅ ÉCART NORMAL : L'écart est aligné avec l'optimisme statistique standard.", style="color:#166534; font-size:0.9em;")
+     if(is_normal_gap) p("✅ ÉCART NORMAL : L'écart est aligné avec l'optimisme statistique standard.", style="color:#166534; font-size:0.9em;")
         else p("⚠️ ÉCART ATYPIQUE : La dérive dépasse les seuils attendus.", style="color:#92400e; font-size:0.9em;")
     )
   })
@@ -1086,9 +1091,9 @@ server <- function(input, output, session) {
       "<p style='margin-bottom:5px; color:#4c1d95; font-weight:bold;'>Variables ayant le plus influencé l'IA pour ce patient :</p><ul style='color:#475569;'>"
     )
     for(v in names(extreme_vars)) {
-      val <- z_scores[v]
-      signe <- ifelse(val > 0, "+", "")
-      html_str <- paste0(html_str, "<li><b>", v, "</b> : ", signe, round(val, 2), " <i>écarts-types par rapport à la moyenne de son groupe diagnostique</i></li>")
+       val <- z_scores[v]
+       signe <- ifelse(val > 0, "+", "")
+       html_str <- paste0(html_str, "<li><b>", v, "</b> : ", signe, round(val, 2), " <i>écarts-types par rapport à la moyenne de son groupe diagnostique</i></li>")
     }
     html_str <- paste0(html_str, "</ul></div>")
     
@@ -1099,14 +1104,14 @@ server <- function(input, output, session) {
     req(m_res$table_matutes_html)
     div(class="modern-card", style="border-top: 5px solid #4c1d95;",
         h4("Classification Diagnostique (PERCYMAT vs Matutes)", style="font-weight:700; color:#a855f7; margin-bottom:10px;"),
-        p("Les patients dits 'atypiques' (Bords Rouge) sont détectés par calcul de la différence entre probabilité calculée et diagnostic final. Les seuils de la zone d’incertitude sont adaptés en fonction des résultats de la cohorte d’apprentissage sur le groupe Out-Of-Bag. Cliquez sur un point pour voir les caractéristiques.", style="font-size:0.85em; color:#64748b;"),
+       p("Les patients dits 'atypiques' (Bords Rouge) sont détectés par calcul de la différence entre probabilité calculée et diagnostic final. Les seuils de la zone d’incertitude sont adaptés en fonction des résultats de la cohorte d’apprentissage sur le groupe Out-Of-Bag. Cliquez sur un point pour voir les caractéristiques.", style="font-size:0.85em; color:#64748b;"),
         
         HTML(m_res$matutes_stats_html),
         
         fluidRow(
           column(12, 
-                 plotOutput("plot_matutes_jitter", click = "plot_matutes_click"),
-                 uiOutput("matutes_click_info")
+             plotOutput("plot_matutes_jitter", click = "plot_matutes_click"),
+              uiOutput("matutes_click_info")
           )
         ),
         br(),
@@ -1130,18 +1135,18 @@ server <- function(input, output, session) {
       scale_color_identity() +
       scale_x_continuous(breaks = 1:3, labels = levels(m_res$df_reclass$Groupe)) +
       scale_y_continuous(labels = scales::percent_format(accuracy=1), limits = c(0, 1)) +
-      theme_minimal(base_size=14) + labs(x = "Score de Matutes Humain", y = "Probabilité calculée", fill="Diagnostic Réel", shape="Diagnostic Réel", title="Dispersion des patients (Seuils adaptatifs OOB)") +
+     theme_minimal(base_size=14) + labs(x = "Score de Matutes Humain", y = "Probabilité calculée", fill="Diagnostic Réel", shape="Diagnostic Réel", title="Dispersion des patients (Seuils adaptatifs OOB)") +
       theme(legend.position="bottom", plot.title=element_text(face="bold", color="#0f172a"), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
-    
-    # Cross-highlight ciblé depuis le tableau ou l'UMAP
-    if(!is.null(selected_patient())) {
-      highlight_data <- m_res$df_reclass[m_res$df_reclass$ID_Interne == selected_patient(), ]
-      if(nrow(highlight_data) > 0) {
-        p <- p + geom_point(data = highlight_data, aes(x = X_jitter, y = Prob_AI), color = "black", fill = "yellow", size = 6, shape = 21, stroke = 2) +
-          geom_point(data = highlight_data, aes(x = X_jitter, y = Prob_AI), color = "red", size = 10, shape = 1, stroke = 1.5)
+      
+      # Cross-highlight ciblé depuis le tableau ou l'UMAP
+      if(!is.null(selected_patient())) {
+         highlight_data <- m_res$df_reclass[m_res$df_reclass$ID_Interne == selected_patient(), ]
+         if(nrow(highlight_data) > 0) {
+            p <- p + geom_point(data = highlight_data, aes(x = X_jitter, y = Prob_AI), color = "black", fill = "yellow", size = 6, shape = 21, stroke = 2) +
+                     geom_point(data = highlight_data, aes(x = X_jitter, y = Prob_AI), color = "red", size = 10, shape = 1, stroke = 1.5)
+         }
       }
-    }
-    return(p)
+      return(p)
   })
   
   output$heatmap_matutes_ui <- renderUI({
@@ -1152,7 +1157,7 @@ server <- function(input, output, session) {
         plotOutput("plot_heatmap", height = "500px")
     )
   })
-  
+ 
   output$plot_heatmap <- renderPlot({
     req(m_res$plot_heatmap)
     grid::grid.draw(m_res$plot_heatmap$gtable)
@@ -1193,8 +1198,8 @@ server <- function(input, output, session) {
       )), collapse="") 
     }
     fluidRow(
-      column(6, div(class="modern-card", style="border-top:4px solid #10b981; background-color: #f0fdf4;", h4("Variables LLC (OR > 1)", style="margin-bottom:15px; font-weight:700;"), HTML(format_list(top_l)))),
-      column(6, div(class="modern-card", style="border-top:4px solid #ef4444; background-color: #fef2f2;", h4("Variables Non-LLC (OR < 1)", style="margin-bottom:15px; font-weight:700;"), HTML(format_list(top_n))))
+     column(6, div(class="modern-card", style="border-top:4px solid #10b981; background-color: #f0fdf4;", h4("Variables (OR > 1)", style="margin-bottom:15px; font-weight:700;"), HTML(format_list(top_l)))),
+      column(6, div(class="modern-card", style="border-top:4px solid #ef4444; background-color: #fef2f2;", h4("Variables (OR < 1)", style="margin-bottom:15px; font-weight:700;"), HTML(format_list(top_n))))
     )
   })
   
@@ -1216,65 +1221,65 @@ server <- function(input, output, session) {
       stat_ellipse(aes(group = Cluster, fill = Cluster), geom = "polygon", alpha = 0.15, color = NA, level = 0.8) +
       geom_point(aes(color = Couleur_Groupe, shape = Statut_Reel), size = 3.5, alpha = 0.85) + 
       
-      scale_color_manual(values = c("Apprentissage (Vert)" = "#10b981", 
-                                    "Validation (Bleu)" = "#3b82f6", 
-                                    "Atypique (Violet)" = "#9333ea",
-                                    "Matutes 3 (Rouge)" = "#ef4444")) +
-      scale_shape_manual(values = c("LLC" = 16, "Autre" = 17)) +
+    scale_color_manual(values = c("Apprentissage (Vert)" = "#10b981", 
+                                        "Validation (Bleu)" = "#3b82f6", 
+                                          "Atypique (Violet)" = "#9333ea",
+                                        "Matutes 3 (Rouge)" = "#ef4444")) +
+  scale_shape_manual(values = c("LLC" = 16, "Autre" = 17)) +
       theme_minimal() + 
       labs(x = "UMAP 1", y = "UMAP 2", title = "UMAP & HDBSCAN Clustering", color = "Légende", shape = "Diagnostic Réel", fill = "Clusters Détectés")
-    
+      
     # Cross-highlight ciblé depuis le tableau ou Matutes
     if(!is.null(selected_patient())) {
-      highlight_data <- m_res$df_plot_pca[m_res$df_plot_pca$ID == selected_patient(), ]
-      if(nrow(highlight_data) > 0) {
-        p <- p + geom_point(data = highlight_data, aes(x = UMAP1, y = UMAP2), color = "black", fill = "yellow", size = 6, shape = 21, stroke = 2) +
-          geom_point(data = highlight_data, aes(x = UMAP1, y = UMAP2), color = "red", size = 10, shape = 1, stroke = 1.5)
-      }
+        highlight_data <- m_res$df_plot_pca[m_res$df_plot_pca$ID == selected_patient(), ]
+        if(nrow(highlight_data) > 0) {
+            p <- p + geom_point(data = highlight_data, aes(x = UMAP1, y = UMAP2), color = "black", fill = "yellow", size = 6, shape = 21, stroke = 2) +
+                     geom_point(data = highlight_data, aes(x = UMAP1, y = UMAP2), color = "red", size = 10, shape = 1, stroke = 1.5)
+        }
     }
     return(p)
   })
   
   # Boîte de détails pour l'UMAP (lié au patient sélectionné globalement)
   output$cluster_click_info <- renderUI({
-    req(selected_patient(), m_res$df_plot_pca, m_res$z_scores_intra)
-    
-    id <- selected_patient()
-    idx_row <- which(m_res$df_plot_pca$ID == id)
-    if (length(idx_row) == 0) return(NULL)
-    
-    clicked_pt <- m_res$df_plot_pca[idx_row[1], ]
-    
-    id_interne <- clicked_pt$ID
-    idx_pat <- clicked_pt$RowIndex
-    groupe_reel <- as.character(clicked_pt$Statut_Reel)
-    prob_pat <- clicked_pt$Probabilite
-    
-    matutes_val <- clicked_pt$Matutes
-    matutes_str <- ifelse(is.na(matutes_val), "ND", matutes_val)
-    iso_forest <- ifelse(clicked_pt$Atypique, "Atypique", "Normal")
-    
-    z_scores_pat_intra <- m_res$z_scores_intra[idx_pat, ]
-    top_vars_pat <- sort(abs(z_scores_pat_intra), decreasing = TRUE)[1:min(5, length(z_scores_pat_intra))]
-    
-    html_str <- paste0(
-      "<div style='background:#faf5ff; border-left:5px solid #4c1d95; padding:15px; border-radius:8px; margin-top:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>",
-      "<h5 style='color:#a855f7; font-weight:bold; margin-top:0;'> Patient Sélectionné : ", id_interne, "</h5>",
-      "<p style='color:#334155; font-size:0.95em;'><b>Diagnostic Réel :</b> ", groupe_reel, 
-      " | <b>Score Matutes :</b> ", matutes_str,
-      " | <b>Probabilité IA :</b> ", round(prob_pat*100, 1), "%",
-      " | <b>Résultat Isolation Forest :</b> ", iso_forest, "</p>",
-      "<p style='margin-bottom:5px; color:#4c1d95; font-weight:bold;'>Profil UMAP (Z-scores) intra-groupe :</p><ul style='color:#334155; margin-bottom:0;'>"
-    )
-    
-    for(v in names(top_vars_pat)) {
-      val <- z_scores_pat_intra[v]
-      signe <- ifelse(val > 0, "+", "")
-      html_str <- paste0(html_str, "<li><b>", v, "</b> : ", signe, round(val, 2), " <i>écarts-types par rapport à la moyenne de son groupe diagnostique</i></li>")
-    }
-    html_str <- paste0(html_str, "</ul></div>")
-    
-    HTML(html_str)
+      req(selected_patient(), m_res$df_plot_pca, m_res$z_scores_intra)
+ 
+      id <- selected_patient()
+      idx_row <- which(m_res$df_plot_pca$ID == id)
+      if (length(idx_row) == 0) return(NULL)
+ 
+      clicked_pt <- m_res$df_plot_pca[idx_row[1], ]
+ 
+      id_interne <- clicked_pt$ID
+      idx_pat <- clicked_pt$RowIndex
+      groupe_reel <- as.character(clicked_pt$Statut_Reel)
+      prob_pat <- clicked_pt$Probabilite
+      
+      matutes_val <- clicked_pt$Matutes
+      matutes_str <- ifelse(is.na(matutes_val), "ND", matutes_val)
+      iso_forest <- ifelse(clicked_pt$Atypique, "Atypique", "Normal")
+      
+      z_scores_pat_intra <- m_res$z_scores_intra[idx_pat, ]
+      top_vars_pat <- sort(abs(z_scores_pat_intra), decreasing = TRUE)[1:min(5, length(z_scores_pat_intra))]
+ 
+      html_str <- paste0(
+        "<div style='background:#faf5ff; border-left:5px solid #4c1d95; padding:15px; border-radius:8px; margin-top:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>",
+        "<h5 style='color:#a855f7; font-weight:bold; margin-top:0;'> Patient Sélectionné : ", id_interne, "</h5>",
+        "<p style='color:#334155; font-size:0.95em;'><b>Diagnostic Réel :</b> ", groupe_reel,
+        " | <b>Score Matutes :</b> ", matutes_str,
+        " | <b>Probabilité IA :</b> ", round(prob_pat*100, 1), "%",
+        " | <b>Résultat Isolation Forest :</b> ", iso_forest, "</p>",
+        "<p style='margin-bottom:5px; color:#4c1d95; font-weight:bold;'>Profil UMAP (Z-scores) intra-groupe :</p><ul style='color:#334155; margin-bottom:0;'>"
+      )
+      
+      for(v in names(top_vars_pat)) {
+         val <- z_scores_pat_intra[v]
+         signe <- ifelse(val > 0, "+", "")
+         html_str <- paste0(html_str, "<li><b>", v, "</b> : ", signe, round(val, 2), " <i>écarts-types par rapport à la moyenne de son groupe diagnostique</i></li>")
+      }
+      html_str <- paste0(html_str, "</ul></div>")
+ 
+      HTML(html_str)
   })
   
   output$table_recap_atypiques <- renderDT({
@@ -1347,10 +1352,10 @@ server <- function(input, output, session) {
     })
     
     output$patient_explain_ui <- renderUI({
-      div(class="modern-card",
-          h4(icon("brain"), "Explication", style="font-weight:700; color:#0f172a; margin-bottom:15px;"),
-          p("Ce graphique démontre l'impact mathématique (Poids × Z-score du patient) de chaque marqueur ou variable pour ce patient.", style="font-size:0.9em; color:#64748b;"),
-          plotOutput("plot_shap", height="350px")
+     div(class="modern-card",
+        h4(icon("brain"), "Explication", style="font-weight:700; color:#0f172a; margin-bottom:15px;"),
+        p("Ce graphique démontre l'impact mathématique (Poids × Z-score du patient) de chaque marqueur ou variable pour ce patient.", style="font-size:0.9em; color:#64748b;"),
+        plotOutput("plot_shap", height="350px")
       )
     })
     
@@ -1374,17 +1379,51 @@ server <- function(input, output, session) {
       
       contributions <- contributions[contributions$Contribution != 0, ]
       
-      if(nrow(contributions) > 0) {
-        contributions <- contributions[order(abs(contributions$Contribution), decreasing = TRUE)[1:min(10, nrow(contributions))], ]
-        contributions$Sign <- ifelse(contributions$Contribution > 0, "Oriente vers LLC", "Oriente vers Autre Pathologie")
+     if(nrow(contributions) > 0) {
         
-        ggplot(contributions, aes(x = reorder(Feature, abs(Contribution)), y = Contribution, fill = Sign)) +
-          geom_bar(stat="identity", alpha=0.9, width=0.6) + 
-          coord_flip() + 
+        # Fonction locale pour rendre les noms de variables plus lisibles (Ex: A_sursum_B devient A / (A + B))
+        beautify_marker <- function(m) {
+          if(grepl("_sursum_", m)) {
+            pts <- strsplit(m, "_sursum_")[[1]]; return(paste0(pts[1], " / (", pts[1], " + ", pts[2], ")"))
+          } else if(grepl("_logsur_", m)) {
+            pts <- strsplit(m, "_logsur_")[[1]]; return(paste0("log(", pts[1], " / ", pts[2], ")"))
+          } else if(grepl("_diffsum_", m)) {
+            pts <- strsplit(m, "_diffsum_")[[1]]; return(paste0("(", pts[1], " - ", pts[2], ") / (", pts[1], " + ", pts[2], ")"))
+          } else if(grepl("_sur_", m)) {
+            pts <- strsplit(m, "_sur_")[[1]]; return(paste0(pts[1], " / ", pts[2]))
+          } else {
+            return(m)
+          }
+        }
+        
+        # Appliquer les jolis noms
+        contributions$Feature_Joli <- sapply(contributions$Feature, beautify_marker)
+        
+        # Sélectionner les 12 plus fortes contributions absolues (pour éviter un graphique illisible)
+        top_indices <- order(abs(contributions$Contribution), decreasing = TRUE)[1:min(12, nrow(contributions))]
+        contributions <- contributions[top_indices, ]
+        
+        # Trier le "factor" selon la valeur RÉELLE pour séparer visuellement les positifs (en haut) des négatifs (en bas)
+       contributions$Feature_Joli <- factor(contributions$Feature_Joli, levels = contributions$Feature_Joli[order(contributions$Contribution)])
+        
+        # Définir le sens et corriger la logique des couleurs
+       contributions$Sign <- ifelse(contributions$Contribution > 0, "Oriente vers LLC (+)", "Oriente vers Autre (-)")
+        
+        ggplot(contributions, aes(x = Feature_Joli, y = Contribution, fill = Sign)) +
+          geom_bar(stat = "identity", alpha = 0.9, width = 0.65, color = "white", linewidth = 0.5) +
+          geom_text(aes(label = sprintf("%+0.2f", Contribution),
+                        hjust = ifelse(Contribution > 0, -0.2, 1.2)),
+                    size = 4, fontface = "bold", color = "#1e293b") +
+          coord_flip() +
           theme_minimal(base_size = 14) +
-          scale_fill_manual(values=c("Pousse vers LLC"="#ef4444", "Pousse vers Autre Pathologie"="#3b82f6")) +
-          labs(x="Marqueurs / Variables", y="Contribution (Poids × Valeur)", fill="Direction :") +
-          theme(legend.position="bottom", panel.grid.major.y = element_blank())
+          scale_fill_manual(values = c("Oriente vers LLC (+)" = "#ef4444", "Oriente vers Autre (-)" = "#3b82f6")) +
+         scale_y_continuous(expand = expansion(mult = c(0.25, 0.25))) + # Marge pour que le texte ne soit pas coupé
+          geom_hline(yintercept = 0, linetype = "solid", color = "#1e293b", linewidth = 1) +
+          labs(x = "", y = "Contribution au Log-Odds (Poids du Modèle × Z-score du Patient)", fill = "Impact Prédictif :") +
+          theme(legend.position = "top",
+                legend.title = element_text(face="bold"),
+                panel.grid.major.y = element_blank(), # Supprime les lignes horizontales gênantes derrière les barres
+                axis.text.y = element_text(fontface = "bold", size = 11))
       } else {
         ggplot() + annotate("text", x=0, y=0, label="Aucune contribution significative", color="#64748b") + theme_void()
       }
