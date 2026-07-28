@@ -68,7 +68,7 @@ mod_modeling_ui <- function(id) {
       fileInput(ns("file_ext"), "Import CSV / Excel", accept = c(".csv", "text/csv", ".xlsx", ".xls")),
       
       hr(),
-      numericInput(ns("cv_repeats"), "Number of Nested-CV Repeats", value = 10, min = 1, max = 50),
+      numericInput(ns("cv_repeats"), "Number of Nested-CV Repeats", value = 1, min = 1, max = 1),
       
       hr(),
       actionButton(ns("update_model"), "RUN MODELING",
@@ -229,7 +229,7 @@ mod_modeling_server <- function(id) {
           w_full[y == 0] <- length(y) / (2 * sum(y == 0))
         }
         
-        ctrl <- trainControl(method = "repeatedcv", number = 5, repeats = input$cv_repeats, savePredictions = "final", classProbs = TRUE, summaryFunction = twoClassSummary)
+        ctrl <- trainControl(method = "cv", number = 5, savePredictions = "final", classProbs = TRUE, summaryFunction = twoClassSummary)
         tune_grid <- expand.grid(alpha = seq(0, 1, by = 0.05), lambda = 10^seq(-5, 1, length = 100))
         
         fit_caret <- suppressWarnings(train(x = x_net_final, y = y_factor, method = "glmnet", weights = w_full, trControl = ctrl, preProcess = c("center", "scale"), tuneGrid = tune_grid, metric = "ROC"))
