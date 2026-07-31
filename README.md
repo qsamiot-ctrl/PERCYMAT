@@ -52,10 +52,12 @@ To run this application locally, you need **R** installed on your system (and id
 <details>
 <summary><b>Click to view installation instructions</b></summary>
 
-**1. Clone the Repository**
 ```bash
+
+1. Clone the Repository
 git clone [https://github.com/YOUR_USERNAME/PERCYMAT.git](https://github.com/YOUR_USERNAME/PERCYMAT.git)
 cd PERCYMAT
+
 2. Install Dependencies The application automatically checks for and installs missing packages upon startup. You can also install them manually by running the following command in your R console[cite: 3]: 
 R
 required_packages <- c(
@@ -66,9 +68,12 @@ required_packages <- c(
   "tidyr", "caret" 
 )
 install.packages(required_packages)
-3. Launch the Application Open the app.R file (or main script) in RStudio and click "Run App", or execute the following command in R[cite: 3]:
+
+3. Launch the Application
+Open the app.R file (or main script) in RStudio and click "Run App", or execute the following command in R[cite: 3]:
 R
 shiny::runApp()
+
 📁 Specific Data Format
 The application accepts CSV (.csv, text/csv) or Excel (.xls, .xlsx) files. To ensure proper processing, your data file must strictly follow this nomenclature[cite: 3]: 
 Column Name	Description	Requirement
@@ -76,6 +81,7 @@ LLC (or LLC_1)	The target column containing the final diagnosis (coded in binary
 Marker Columns	All numeric columns corresponding to biological markers. These variables are automatically detected, standardized (Z-score), and used to generate comprehensive combinatorial variables (ratios, log-ratios, differences, etc.). 	Mandatory
 Matutes	The column containing the human Matutes score. If provided, the app automatically generates reclassification tables (PERCYMAT vs Matutes) and a hierarchical clustering Heatmap for Matutes 3 patients[cite: 2]. 	Optional
 ID_Interne	Patient identifier (automatically generated as Patient_X if missing)[cite: 2].	Optional
+
 🧠 Algorithmic Architecture
 PERCYMAT v2.4 implements high-tier statistical learning concepts to ensure robust and interpretable results[cite: 2, 3]:
 •	🔁 Repeated Nested Cross-Validation: An automated Caret modeling framework using a 5-fold inner loop for tuning[cite: 2].
