@@ -47,6 +47,7 @@ To run this application locally, you need **R** installed on your system (and id
 ```bash
 git clone [https://github.com/YOUR_USERNAME/PERCYMAT.git](https://github.com/YOUR_USERNAME/PERCYMAT.git)
 cd PERCYMAT
+
 2. Install Dependencies
 The application automatically checks for and installs missing packages upon startup. You can also install them manually by running the following command in your R console:[cite: 3] 
 R
@@ -62,6 +63,7 @@ install.packages(required_packages)
 Open the app.R file (or main script) in RStudio and click "Run App", or execute the following command in R:[cite: 3]
 R
 shiny::runApp()
+
 📊 Specific Data Format
 The application accepts CSV (.csv, text/csv) or Excel (.xls, .xlsx) files. To ensure proper processing, your data file must strictly follow this nomenclature:[cite: 3] 
 •	LLC (or LLC_1) Column: The target column containing the final diagnosis (coded in binary format: 1 for CLL, 0 for another pathology / alternative diagnosis). 
@@ -85,11 +87,11 @@ Step 3: Patient Diagnosis
 3.	Click "CALCULATE CLL PROBABILITY"[cite: 2].
 4.	Review the computed probability, the Conformal Prediction guarantee, and the explanation graph breaking down the mathematical impact[cite: 2].
 🧠 Algorithmic Architecture
-PERCYMAT v2.4 implements high-tier statistical learning concepts:[cite: 2, 3]
-•	Repeated Nested Cross-Validation: An automated Caret modeling framework using a 5-fold inner loop for tuning[cite: 2].
-•	Elastic-Net Regularization: Combines L1 and L2 penalties via grid search (Alpha 0 to 1, Lambda 10^-5 to 10) to identify predictive markers[cite: 2].
-•	Z-score Standardization: Transforms raw measurements into standardized Z-scores to align marker magnitudes[cite: 2].
-•	Bayesian Platt Scaling: Calibrates raw log-odds predictions using an out-of-bag Bayesian logistic regression model[cite: 2].
-•	HDBSCAN Clustering & Isolation Forest: Unsupervised topographic workflows and absolute anomaly thresholds for atypical profile detection[cite: 2].
-•	Local Log-Odds Explanations (XAI): Deconstructs the patient's predictive score by evaluating Model Weight × Patient Z-score[cite: 2].
-•	Heuristic Uncertainty Bounds / Conformal Prediction: Evaluates certainty against a safety threshold to ensure reliable outputs[cite: 2].
+PERCYMAT v2.4 implements high-tier statistical learning concepts to ensure robust and interpretable results:[cite: 2, 3]
+🔁 Repeated Nested Cross-Validation: An automated Caret modeling framework using a 5-fold inner loop for hyperparameter tuning, preventing data leakage[cite: 2].
+⚖️ Elastic-Net Regularization: Combines L1 (Lasso) and L2 (Ridge) penalties via an extensive grid search (Alpha 0 to 1, Lambda $10^{-5}$ to 10) to select the most predictive markers[cite: 2].
+📏 Z-score Standardization: Automatically transforms raw biological measurements into standardized Z-scores to perfectly align marker magnitudes[cite: 2].
+📊 Bayesian Platt Scaling: Calibrates raw log-odds predictions using an out-of-bag Bayesian logistic regression model to reflect true clinical probabilities[cite: 2].
+🗺️ HDBSCAN & Isolation Forest: Utilizes unsupervised topographic clustering and applies absolute anomaly thresholds to flag atypical patient profiles[cite: 2].
+💡 Local Log-Odds Explanations (XAI): Deconstructs the patient's predictive score by evaluating the exact contribution of each feature (Model Weight × Patient Z-score)[cite: 2].
+🛡️ Conformal Prediction: Wraps the final output in heuristic uncertainty bounds, evaluating model certainty against strict safety thresholds to ensure reliable diagnostic outputs[cite: 2].
