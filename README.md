@@ -47,7 +47,10 @@ To run this application locally, you need **R** installed on your system (and id
 ```bash
 git clone [https://github.com/YOUR_USERNAME/PERCYMAT.git](https://github.com/YOUR_USERNAME/PERCYMAT.git)
 cd PERCYMAT
-2. Install DependenciesThe application automatically checks for and installs missing packages upon startup. You can also install them manually by running the following command in your R console:[cite: 3]  Rrequired_packages <- c(
+2. Install Dependencies
+The application automatically checks for and installs missing packages upon startup. You can also install them manually by running the following command in your R console:[cite: 3] 
+R
+required_packages <- c(
   "shiny", "pROC", "shinythemes", "glmnet", "DT", 
   "ggplot2", "stats", "arm", "rmarkdown", "dplyr",
   "gridExtra", "PRROC", "readxl", "tools", "scales",
@@ -55,5 +58,38 @@ cd PERCYMAT
   "tidyr", "caret" 
 )
 install.packages(required_packages)
-3. Launch the ApplicationOpen the app.R file (or main script) in RStudio and click "Run App", or execute the following command in R:[cite: 3]Rshiny::runApp()
-📊 Specific Data FormatThe application accepts CSV (.csv, text/csv) or Excel (.xls, .xlsx) files. To ensure proper processing, your data file must strictly follow this nomenclature:[cite: 3]  LLC (or LLC_1) Column: The target column containing the final diagnosis (coded in binary format: 1 for CLL, 0 for another pathology / alternative diagnosis).  Marker Columns: All numeric columns corresponding to biological markers. These variables are automatically detected, standardized (Z-score), and used to generate comprehensive combinatorial variables (ratios, log-ratios, differences, etc.).  Matutes Column: The column containing the human Matutes score (optional). If provided, the app automatically generates reclassification tables (PERCYMAT vs Matutes) and a hierarchical clustering Heatmap for Matutes 3 patients.  Identifier: An ID_Interne column (optional; automatically generated as Patient_X if missing).  📖 User GuideStep 1: Model TrainingNavigate to the 1. MODELING tab.  Upload your Training Cohort data file.  (Optional) Upload an External Validation Cohort file.  Define the Number of Nested-CV Repeats.  Click "RUN MODELING" to launch the automated modeling process.  Step 2: Performance & Topography AnalysisMetrics: Review the performances on the Training Cohort (Repeated Nested-CV / OOB) and Advanced OOB Metrics (PR-AUC, Calib Int/Slope, Emax, ICI).  Model Coefficients: Check the Elastic-Net coefficients table to identify variables with positive and negative impacts.  Clusters & Atypia: Click on individual points in the interactive UMAP & HDBSCAN Clustering chart to view characteristics of atypical patients detected via Isolation Forest.  Step 3: Patient DiagnosisSwitch to the 2. DIAGNOSIS tab.  Fill in the Biomarker Input (MFI) values for the new patient.  Click "CALCULATE CLL PROBABILITY"[cite: 2].Review the computed probability, the Conformal Prediction guarantee, and the explanation graph breaking down the mathematical impact[cite: 2].🧠 Algorithmic ArchitecturePERCYMAT v2.4 implements high-tier statistical learning concepts:[cite: 2, 3]Repeated Nested Cross-Validation: An automated Caret modeling framework using a 5-fold inner loop for tuning[cite: 2].Elastic-Net Regularization: Combines L1 and L2 penalties via grid search (Alpha 0 to 1, Lambda 10^-5 to 10) to identify predictive markers[cite: 2].Z-score Standardization: Transforms raw measurements into standardized Z-scores to align marker magnitudes[cite: 2].Bayesian Platt Scaling: Calibrates raw log-odds predictions using an out-of-bag Bayesian logistic regression model[cite: 2].HDBSCAN Clustering & Isolation Forest: Unsupervised topographic workflows and absolute anomaly thresholds for atypical profile detection[cite: 2].Local Log-Odds Explanations (XAI): Deconstructs the patient's predictive score by evaluating Model Weight × Patient Z-score[cite: 2].Heuristic Uncertainty Bounds / Conformal Prediction: Evaluates certainty against a safety threshold to ensure reliable outputs[cite: 2].
+3. Launch the Application
+Open the app.R file (or main script) in RStudio and click "Run App", or execute the following command in R:[cite: 3]
+R
+shiny::runApp()
+📊 Specific Data Format
+The application accepts CSV (.csv, text/csv) or Excel (.xls, .xlsx) files. To ensure proper processing, your data file must strictly follow this nomenclature:[cite: 3] 
+•	LLC (or LLC_1) Column: The target column containing the final diagnosis (coded in binary format: 1 for CLL, 0 for another pathology / alternative diagnosis). 
+•	Marker Columns: All numeric columns corresponding to biological markers. These variables are automatically detected, standardized (Z-score), and used to generate comprehensive combinatorial variables (ratios, log-ratios, differences, etc.). 
+•	Matutes Column: The column containing the human Matutes score (optional). If provided, the app automatically generates reclassification tables (PERCYMAT vs Matutes) and a hierarchical clustering Heatmap for Matutes 3 patients. 
+•	Identifier: An ID_Interne column (optional; automatically generated as Patient_X if missing). 
+📖 User Guide
+Step 1: Model Training
+1.	Navigate to the 1. MODELING tab. 
+2.	Upload your Training Cohort data file. 
+3.	(Optional) Upload an External Validation Cohort file. 
+4.	Define the Number of Nested-CV Repeats. 
+5.	Click "RUN MODELING" to launch the automated modeling process. 
+Step 2: Performance & Topography Analysis
+•	Metrics: Review the performances on the Training Cohort (Repeated Nested-CV / OOB) and Advanced OOB Metrics (PR-AUC, Calib Int/Slope, Emax, ICI). 
+•	Model Coefficients: Check the Elastic-Net coefficients table to identify variables with positive and negative impacts. 
+•	Clusters & Atypia: Click on individual points in the interactive UMAP & HDBSCAN Clustering chart to view characteristics of atypical patients detected via Isolation Forest. 
+Step 3: Patient Diagnosis
+1.	Switch to the 2. DIAGNOSIS tab. 
+2.	Fill in the Biomarker Input (MFI) values for the new patient. 
+3.	Click "CALCULATE CLL PROBABILITY"[cite: 2].
+4.	Review the computed probability, the Conformal Prediction guarantee, and the explanation graph breaking down the mathematical impact[cite: 2].
+🧠 Algorithmic Architecture
+PERCYMAT v2.4 implements high-tier statistical learning concepts:[cite: 2, 3]
+•	Repeated Nested Cross-Validation: An automated Caret modeling framework using a 5-fold inner loop for tuning[cite: 2].
+•	Elastic-Net Regularization: Combines L1 and L2 penalties via grid search (Alpha 0 to 1, Lambda 10^-5 to 10) to identify predictive markers[cite: 2].
+•	Z-score Standardization: Transforms raw measurements into standardized Z-scores to align marker magnitudes[cite: 2].
+•	Bayesian Platt Scaling: Calibrates raw log-odds predictions using an out-of-bag Bayesian logistic regression model[cite: 2].
+•	HDBSCAN Clustering & Isolation Forest: Unsupervised topographic workflows and absolute anomaly thresholds for atypical profile detection[cite: 2].
+•	Local Log-Odds Explanations (XAI): Deconstructs the patient's predictive score by evaluating Model Weight × Patient Z-score[cite: 2].
+•	Heuristic Uncertainty Bounds / Conformal Prediction: Evaluates certainty against a safety threshold to ensure reliable outputs[cite: 2].
